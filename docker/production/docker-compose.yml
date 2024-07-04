@@ -1,0 +1,37 @@
+services:
+  next-app:
+    container_name: next-app
+    build:
+      context: ../../
+      dockerfile: docker/production/Dockerfile
+    # Set environment variables directly in the docker-compose file
+    environment:
+      ENV_VARIABLE: ${ENV_VARIABLE}
+      NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+    env_file:
+      - "../../.env"
+    restart: always
+    ports:
+      - 3000:3000
+    # command:
+    #   - pnpm start
+    networks:
+      - production_networks
+
+  nginx:
+    build:
+      context: ../../nginx
+      # dockerfile: nginx/Dockerfile
+    depends_on:
+      - next-app
+    ports:
+      - 80:80
+    networks:
+      - production_networks
+
+networks:
+  production_networks:
+    driver: bridge
+
+volumes:
+  staticbuild:
